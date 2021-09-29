@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class RickMortyCharacter {
 
+    //region Gson Data
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -44,6 +45,9 @@ public class RickMortyCharacter {
     @Expose
     private String created;
 
+    //endregion
+
+    //region Constructors
     public RickMortyCharacter() {
 
     }
@@ -62,6 +66,10 @@ public class RickMortyCharacter {
         this.url = url;
         this.created = created;
     }
+
+    //endregion
+
+    //region Getter and Setter
 
     public Integer getId() {
         return id;
@@ -158,5 +166,7 @@ public class RickMortyCharacter {
     public void setCreated(String created) {
         this.created = created;
     }
+
+    //endregion
 
 }

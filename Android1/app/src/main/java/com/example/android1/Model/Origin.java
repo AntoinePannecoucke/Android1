@@ -5,13 +5,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class Origin {
 
+    //region Gson Data
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("url")
     @Expose
     private String url;
+    //endregion
 
+    //region Getter et Setter
     public String getName() {
         return name;
     }
@@ -27,5 +30,6 @@ public class Origin {
     public void setUrl(String url) {
         this.url = url;
     }
+    //endregion
 
 }

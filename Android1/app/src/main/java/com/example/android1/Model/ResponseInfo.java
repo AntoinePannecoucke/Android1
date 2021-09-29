@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class ResponseInfo {
 
+    //region Gson Data
     @SerializedName("count")
     @Expose
     private Integer count;
@@ -18,6 +19,9 @@ public class ResponseInfo {
     @Expose
     private Object prev;
 
+    //endregion
+
+    //region Getter et Setter
     public Integer getCount() {
         return count;
     }
@@ -49,5 +53,5 @@ public class ResponseInfo {
     public void setPrev(Object prev) {
         this.prev = prev;
     }
-
+    //endregion
 }

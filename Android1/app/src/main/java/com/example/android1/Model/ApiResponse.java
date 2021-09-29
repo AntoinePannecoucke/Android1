@@ -6,28 +6,31 @@ import com.google.gson.annotations.SerializedName;
 
 public class ApiResponse {
 
-        @SerializedName("info")
-        @Expose
-        private ResponseInfo info;
-        @SerializedName("results")
-        @Expose
-        private List<RickMortyCharacter> results = null;
+    //region Gson Data
+    @SerializedName("info")
+    @Expose
+    private ResponseInfo info;
+    @SerializedName("results")
+    @Expose
+    private List<RickMortyCharacter> results = null;
+    //endregion
 
-        public ResponseInfo getInfo() {
-            return info;
-        }
+    //region Getter et Setter
+    public ResponseInfo getInfo() {
+        return info;
+    }
 
-        public void setInfo(ResponseInfo info) {
-            this.info = info;
-        }
+    public void setInfo(ResponseInfo info) {
+        this.info = info;
+    }
 
-        public List<RickMortyCharacter> getResults() {
-            return results;
-        }
+    public List<RickMortyCharacter> getResults() {
+        return results;
+    }
 
-        public void setResults(List<RickMortyCharacter> results) {
-            this.results = results;
-        }
-
+    public void setResults(List<RickMortyCharacter> results) {
+        this.results = results;
+    }
+    //endregion
     
 }

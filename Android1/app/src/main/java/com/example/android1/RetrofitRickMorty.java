@@ -6,6 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitRickMorty {
     private static Retrofit retrofit;
 
+    /**
+     * Base URL for retrofit requests
+     */
     private static final String BASE_URL = "https://rickandmortyapi.com";
 
     public static Retrofit getRetrofitInstance() {

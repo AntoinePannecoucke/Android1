@@ -4,14 +4,16 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Location {
-
+    //region Gson Data
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("url")
     @Expose
     private String url;
+    //endregion
 
+    //region Getter et Setter
     public String getName() {
         return name;
     }
@@ -27,5 +29,5 @@ public class Location {
     public void setUrl(String url) {
         this.url = url;
     }
-
+    //endregion
 }
