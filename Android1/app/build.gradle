@@ -30,8 +30,16 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
-        // Import the BoM for the Firebase platform
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
+
+
+    // Import the BoM for the Firebase platform
         implementation platform('com.google.firebase:firebase-bom:28.4.1')
 
         // Declare the dependency for the Firebase Authentication library
@@ -40,7 +48,7 @@ dependencies {
 
         // Also declare the dependency for the Google Play services library and specify its version
         implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    
+
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
 
     // Import the BoM for the Firebase platform
