@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/character_item"
+        android:icon="@drawable/ic_morty_icon"
+        android:title="Personnages" />
+    <item
+        android:id="@+id/episode_item"
+        android:icon="@drawable/ic_netflix_icon"
+        android:title="Episodes" />
+    <item
+        android:id="@+id/location_item"
+        android:icon="@drawable/ic_portal_icon"
+        android:title="Lieux" />
+</menu>

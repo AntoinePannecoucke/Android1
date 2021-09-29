@@ -9,7 +9,7 @@ public class RetrofitRickMorty {
     /**
      * Base URL for retrofit requests
      */
-    private static final String BASE_URL = "https://rickandmortyapi.com";
+    private static final String BASE_URL = "https://rickandmortyapi.com/api/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {

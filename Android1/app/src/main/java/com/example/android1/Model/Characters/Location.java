@@ -1,10 +1,9 @@
-package com.example.android1.Model;
+package com.example.android1.Model.Characters;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Origin {
-
+public class Location {
     //region Gson Data
     @SerializedName("name")
     @Expose
@@ -31,5 +30,4 @@ public class Origin {
         this.url = url;
     }
     //endregion
-
 }

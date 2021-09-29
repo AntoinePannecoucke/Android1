@@ -10,8 +10,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android1.Interface.EndScrollListener;
-import com.example.android1.Model.ApiResponse;
-import com.example.android1.Model.RickMortyCharacter;
+import com.example.android1.Model.Characters.ApiResponseCharacters;
+import com.example.android1.Model.Characters.RickMortyCharacter;
 import com.example.android1.R;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
@@ -30,10 +30,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * @param response
      * @param listener
      */
-    public CustomAdapter(Context context,ApiResponse response, EndScrollListener listener){
+    public CustomAdapter(Context context, ApiResponseCharacters response, EndScrollListener listener){
         this.context = context;
         this.dataList = response.getResults();
         this.scrollEndListener = listener;
+    }
+
+    public void clear() {
+        dataList.clear();
     }
 
     //region ViewHolder Class
@@ -116,7 +120,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * Add all the results of a ApiResponse
      * @param response
      */
-    public void addAll(ApiResponse response){
+    public void addAll(ApiResponseCharacters response){
         dataList.addAll(response.getResults());
     }
 }

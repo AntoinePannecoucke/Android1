@@ -1,4 +1,4 @@
-package com.example.android1.Model;
+package com.example.android1.Model.Characters;
 
 import java.util.List;
 
