@@ -1,28 +1,25 @@
-package com.example.android1.Model.Episodes;
+package com.example.android1.Model.Locations;
 
 import java.util.List;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RickMortyEpisode {
-
-    //region Gson Data
+public class RickMortyLocation {
     @SerializedName("id")
     @Expose
     private Integer id;
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("air_date")
+    @SerializedName("type")
     @Expose
-    private String airDate;
-    @SerializedName("episode")
+    private String type;
+    @SerializedName("dimension")
     @Expose
-    private String episode;
-    @SerializedName("characters")
+    private String dimension;
+    @SerializedName("residents")
     @Expose
-    private List<String> characters = null;
+    private List<String> residents = null;
     @SerializedName("url")
     @Expose
     private String url;
@@ -30,9 +27,6 @@ public class RickMortyEpisode {
     @Expose
     private String created;
 
-    //endregion
-
-    //region Getter et Setter
     public Integer getId() {
         return id;
     }
@@ -49,28 +43,28 @@ public class RickMortyEpisode {
         this.name = name;
     }
 
-    public String getAirDate() {
-        return airDate;
+    public String getType() {
+        return type;
     }
 
-    public void setAirDate(String airDate) {
-        this.airDate = airDate;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getEpisode() {
-        return episode;
+    public String getDimension() {
+        return dimension;
     }
 
-    public void setEpisode(String episode) {
-        this.episode = episode;
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 
-    public List<String> getCharacters() {
-        return characters;
+    public List<String> getResidents() {
+        return residents;
     }
 
-    public void setCharacters(List<String> characters) {
-        this.characters = characters;
+    public void setResidents(List<String> residents) {
+        this.residents = residents;
     }
 
     public String getUrl() {
@@ -88,7 +82,6 @@ public class RickMortyEpisode {
     public void setCreated(String created) {
         this.created = created;
     }
-    //endregion
 
 }
 

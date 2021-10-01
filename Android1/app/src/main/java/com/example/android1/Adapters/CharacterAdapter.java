@@ -9,7 +9,9 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.android1.Interface.CustomAdapter;
 import com.example.android1.Interface.EndScrollListener;
+import com.example.android1.Model.ApiResponse;
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Characters.RickMortyCharacter;
 import com.example.android1.R;
@@ -18,7 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder> {
+public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder> implements CustomAdapter {
 
     private List<RickMortyCharacter> dataList;
     private Context context;
@@ -30,18 +32,19 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * @param response
      * @param listener
      */
-    public CustomAdapter(Context context, ApiResponseCharacters response, EndScrollListener listener){
+    public CharacterAdapter(Context context, ApiResponseCharacters response, EndScrollListener listener){
         this.context = context;
         this.dataList = response.getResults();
         this.scrollEndListener = listener;
     }
 
+    @Override
     public void clear() {
         dataList.clear();
     }
 
     //region ViewHolder Class
-    class CustomViewHolder extends RecyclerView.ViewHolder {
+    class CharacterViewHolder extends RecyclerView.ViewHolder {
 
         public final View mView;
 
@@ -56,7 +59,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
          * Constructor
          * @param itemView
          */
-        CustomViewHolder(View itemView) {
+        CharacterViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
 
@@ -76,10 +79,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * @return
      */
     @Override
-    public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CharacterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.rickmortycharacter, parent, false);
-        return new CustomViewHolder(view);
+        return new CharacterViewHolder(view);
     }
 
     /**
@@ -89,7 +92,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * @param position
      */
     @Override
-    public void onBindViewHolder(CustomViewHolder holder, int position) {
+    public void onBindViewHolder(CharacterViewHolder holder, int position) {
         RickMortyCharacter item = (RickMortyCharacter) dataList.get(position);
         holder.characterName.setText(item.getName());
         holder.characterGender.setText(item.getGender());
@@ -104,7 +107,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .into(holder.characterImage);
 
         if (position == dataList.size() - 1){
-            scrollEndListener.onScrollEnd();
+            scrollEndListener.onScrollEnd(this);
         }
     }
 
@@ -120,7 +123,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
      * Add all the results of a ApiResponse
      * @param response
      */
-    public void addAll(ApiResponseCharacters response){
-        dataList.addAll(response.getResults());
+    @Override
+    public void addAll(ApiResponse response){
+        if (response instanceof ApiResponseCharacters){
+            ApiResponseCharacters tmp = (ApiResponseCharacters) response;
+            dataList.addAll(tmp.getResults());
+        }
+
     }
 }

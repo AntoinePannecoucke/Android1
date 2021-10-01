@@ -2,7 +2,6 @@ package com.example.android1;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,15 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.example.android1.Adapters.CustomAdapter;
+import com.example.android1.Adapters.CharacterAdapter;
+import com.example.android1.Adapters.EpisodeAdapter;
+import com.example.android1.Adapters.LocationAdapter;
+import com.example.android1.Interface.CustomAdapter;
 import com.example.android1.Interface.EndScrollListener;
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Episodes.ApiResponseEpisode;
+import com.example.android1.Model.Locations.ApiResponseLocation;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
@@ -91,17 +93,19 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         setContentView(R.layout.activity_main);
 
         InitNav();
+        initRecyclerView();
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         signInLauncher.launch(signInIntent);
 
-        progressDoalog = new ProgressDialog(MainActivity.this);
-        progressDoalog.setMessage("Loading....");
-        progressDoalog.show();
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Loading....");
+        progressDialog.show();
 
         /*Create handle for the RetrofitInstance interface*/
         current_page = 1;
         getCharacterAt(current_page);
+
     }
 
     /**
@@ -129,11 +133,19 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     //endregion
 
     //region RecyclerView
-    private CustomAdapter adapter;
+    private CharacterAdapter charAdapter;
+    private EpisodeAdapter epAdapter;
     private RecyclerView recyclerView;
-    ProgressDialog progressDoalog;
+    private LocationAdapter locAdapter;
+    ProgressDialog progressDialog;
 
     private int current_page;
+
+    private void initRecyclerView(){
+        recyclerView = findViewById(R.id.customRecyclerView);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        recyclerView.setLayoutManager(layoutManager);
+    }
 
     /**
      * Load data of a page
@@ -145,21 +157,27 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         call.enqueue(new Callback<ApiResponseCharacters>() {
             @Override
             public void onResponse(Call<ApiResponseCharacters> call, Response<ApiResponseCharacters> response) {
-                progressDoalog.dismiss();
+                progressDialog.dismiss();
                 if (current_page == 1){
-                    generateDataList(response.body());
+                    putCharacterData(response.body());
                 }
                 else {
-                    adapter.addAll(response.body());
+                    charAdapter.addAll(response.body());
                 }
-                current_page++;
+                try {
+                    ApiResponseCharacters tmp = response.body();
+                    if (tmp.getInfo().getNext() != null) {
+                        current_page++;
+                    }
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onFailure(Call<ApiResponseCharacters> call, Throwable t) {
-                t.printStackTrace();
-                t.getMessage();
-                progressDoalog.dismiss();
+                Log.e("ApiRequest", t.getMessage());
+                progressDialog.dismiss();
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -171,36 +189,91 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         call.enqueue(new Callback<ApiResponseEpisode>() {
             @Override
             public void onResponse(Call<ApiResponseEpisode> call, Response<ApiResponseEpisode> response) {
-                progressDoalog.dismiss();
+                progressDialog.dismiss();
                 if (current_page == 1){
-                    generateDataList(response.body());
+                    putEpisodeData(response.body());
                 }
                 else {
-                    adapter.addAll(response.body());
+                    epAdapter.addAll(response.body());
                 }
-                current_page++;
+
+                try {
+                    ApiResponseEpisode tmp = response.body();
+                    if (tmp.getInfo().getNext() != null) {
+                        current_page++;
+                    }
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onFailure(Call<ApiResponseEpisode> call, Throwable t) {
-                t.printStackTrace();
-                t.getMessage();
-                progressDoalog.dismiss();
+                Log.e("ApiRequest", t.getMessage());
+                progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void getLocationAt(int page){
+        GetDataService service = RetrofitRickMorty.getRetrofitInstance().create(GetDataService.class);
+        Call<ApiResponseLocation> call = service.getAllLocations(page);
+        call.enqueue(new Callback<ApiResponseLocation>() {
+            @Override
+            public void onResponse(Call<ApiResponseLocation> call, Response<ApiResponseLocation> response) {
+                progressDialog.dismiss();
+                if (current_page == 1){
+                    putLocationData(response.body());
+                }
+                else {
+                    locAdapter.addAll(response.body());
+                }
+
+                try {
+                    ApiResponseLocation tmp = response.body();
+                    if (tmp.getInfo().getNext() != null) {
+                        current_page++;
+                    }
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponseLocation> call, Throwable t) {
+                Log.e("ApiRequest", t.getMessage());
+                progressDialog.dismiss();
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     /**
-     * Load data on the RecyclerView
+     * Load Character data on the RecyclerView
      * @param response
      */
-    private void generateDataList(ApiResponseCharacters response) {
-        recyclerView = findViewById(R.id.customRecyclerView);
-        adapter = new CustomAdapter(this, response, this);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+    private void putCharacterData(ApiResponseCharacters response) {
+        charAdapter = new CharacterAdapter(this, response, this);
+        recyclerView.setAdapter(charAdapter);
+    }
+
+    /**
+     * Load Episode data on the RecyclerView
+     * @param response
+     */
+    private void putEpisodeData(ApiResponseEpisode response) {
+        epAdapter = new EpisodeAdapter(response, this);
+        recyclerView.setAdapter(epAdapter);
+    }
+
+    /**
+     * Load Location data on the RecyclerView
+     * @param response
+     */
+    private void putLocationData(ApiResponseLocation response) {
+        locAdapter = new LocationAdapter(response, this);
+        recyclerView.setAdapter(locAdapter);
     }
 
 
@@ -208,8 +281,16 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
      * Load next data at the end of the RecyclerView
      */
     @Override
-    public void onScrollEnd() {
-        getCharacterAt(current_page);
+    public void onScrollEnd(CustomAdapter source) {
+        if (source instanceof CharacterAdapter) {
+            getCharacterAt(current_page);
+        }
+        else if (source instanceof EpisodeAdapter) {
+            getEpisodesAt(current_page);
+        }
+        else if (source instanceof LocationAdapter) {
+            getLocationAt(current_page);
+        }
     }
 
     //endregion
@@ -225,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             @Override
             public void onClick(View view) {
                 reset();
+                navBar.setSelectedItemId(character_item.getId());
                 getCharacterAt(current_page);
             }
         });
@@ -234,6 +316,8 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             @Override
             public void onClick(View view) {
                 reset();
+                navBar.setSelectedItemId(episode_item.getId());
+                getEpisodesAt(current_page);
             }
         });
 
@@ -242,6 +326,9 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             @Override
             public void onClick(View view) {
                 reset();
+                navBar.setSelectedItemId(location_item.getId());
+                getLocationAt(current_page);
+
             }
         });
 
@@ -249,6 +336,12 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
 
     private void reset(){
         current_page = 1;
+        if (charAdapter != null)
+            charAdapter.clear();
+        if (epAdapter != null)
+            epAdapter.clear();
+        if (locAdapter != null)
+            locAdapter.clear();
     }
 
     //endregion

@@ -2,6 +2,7 @@ package com.example.android1;
 
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Episodes.ApiResponseEpisode;
+import com.example.android1.Model.Locations.ApiResponseLocation;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,6 +19,13 @@ public interface GetDataService {
     //region GET Episodes
     @GET("episode/")
     Call<ApiResponseEpisode> getAllEpisodes(
+            @Query("page") int page
+    );
+    //endregion
+
+    //region GET Locations
+    @GET("location/")
+    Call<ApiResponseLocation> getAllLocations(
             @Query("page") int page
     );
     //endregion
