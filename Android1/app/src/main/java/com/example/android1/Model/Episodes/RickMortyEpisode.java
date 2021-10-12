@@ -1,33 +1,51 @@
 package com.example.android1.Model.Episodes;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.List;
 
 import com.example.android1.Model.RickMortyData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class RickMortyEpisode extends RickMortyData {
 
     //region Gson Data
     @SerializedName("id")
+    @PrimaryKey
     @Expose
     private Integer id;
+
     @SerializedName("name")
+    @ColumnInfo(name = "name")
     @Expose
     private String name;
+
     @SerializedName("air_date")
+    @ColumnInfo(name = "air_date")
     @Expose
     private String airDate;
+
     @SerializedName("episode")
+    @ColumnInfo(name = "episode")
     @Expose
     private String episode;
+
     @SerializedName("characters")
+    @ColumnInfo(name = "characters")
     @Expose
     private List<String> characters = null;
+
     @SerializedName("url")
+    @ColumnInfo(name = "url")
     @Expose
     private String url;
+
     @SerializedName("created")
+    @ColumnInfo(name = "created")
     @Expose
     private String created;
 
