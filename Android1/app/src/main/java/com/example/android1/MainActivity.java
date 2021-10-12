@@ -151,16 +151,6 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     //endregion
 
     //region Auth
-    List<AuthUI.IdpConfig> providers = Arrays.asList(
-            new AuthUI.IdpConfig.GoogleBuilder().build(),
-            new AuthUI.IdpConfig.EmailBuilder().build());
-
-    Intent signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build();
-
-    private FirebaseAuth mAuth;
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
@@ -179,14 +169,7 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            // Successfully signed in
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            // ...
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
         }
     }
     //endregion
@@ -209,8 +192,16 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
 
         initNav();
         initRecyclerView();
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                new AuthUI.IdpConfig.EmailBuilder().build());
+
+        Intent signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build();
+
         signInLauncher.launch(signInIntent);
 
         progressDialog = new ProgressDialog(MainActivity.this);
@@ -226,18 +217,6 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
 
     }
 
-    /**
-     * onStart
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            currentUser.reload();
-        }
-    }
 
     /**
      * onStop
