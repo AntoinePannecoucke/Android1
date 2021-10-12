@@ -5,6 +5,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -24,6 +26,8 @@ import com.example.android1.Interface.EndScrollListener;
 import com.example.android1.Model.ApiResponse;
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Characters.RickMortyCharacter;
+import com.example.android1.Model.Database.AppDatabase;
+import com.example.android1.Model.Database.RickMortyDao;
 import com.example.android1.Model.Episodes.ApiResponseEpisode;
 import com.example.android1.Model.Episodes.RickMortyEpisode;
 import com.example.android1.Model.Locations.ApiResponseLocation;
@@ -134,7 +138,12 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
 
     //endregion
 
-    private NavigationBarView navBar;
+    //region Offline
+
+    private AppDatabase database;
+    private RickMortyDao rickMortyDao;
+
+    //endregion
 
     //region Auth
     List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -187,6 +196,9 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        database = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "RickMortyDatabase").build();
+        rickMortyDao = database.rickMortyDao();
 
         sharedPreferences = getSharedPreferences("Favoris", Context.MODE_PRIVATE);
 
@@ -259,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseCharacters> call, Response<ApiResponseCharacters> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
+                rickMortyDao.addAllCharacters(response.body().getResults());
                 if (current_page == 1){
                     putCharacterData(response.body());
                 }
@@ -282,10 +295,17 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseCharacters> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
+                if (current_page == 1){
+                    putCharacterData(rickMortyDao.getCharacters());
+                }
+                else {
+                    charAdapter.addAll(rickMortyDao.getCharacters());
+                }
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void getEpisodesAt(int page){
         GetDataService service = RetrofitRickMorty.getRetrofitInstance().create(GetDataService.class);
@@ -295,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseEpisode> call, Response<ApiResponseEpisode> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
+                rickMortyDao.addAllEpisodes(response.body().getResults());
                 if (current_page == 1){
                     putEpisodeData(response.body());
                 }
@@ -319,6 +340,12 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseEpisode> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
+                if (current_page == 1){
+                    putEpisodeData(rickMortyDao.getEpisodes());
+                }
+                else {
+                    epAdapter.addAll(rickMortyDao.getEpisodes());
+                }
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -332,6 +359,7 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseLocation> call, Response<ApiResponseLocation> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
+                rickMortyDao.addAllLocations(response.body().getResults());
                 if (current_page == 1){
                     putLocationData(response.body());
                 }
@@ -355,6 +383,12 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseLocation> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
+                if (current_page == 1){
+                    putLocationData(rickMortyDao.getLocations());
+                }
+                else {
+                    locAdapter.addAll(rickMortyDao.getLocations());
+                }
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -369,6 +403,11 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         recyclerView.setAdapter(charAdapter);
     }
 
+    private void putCharacterData(List<RickMortyCharacter> characters) {
+        charAdapter = new CharacterAdapter(this, characters, this);
+        recyclerView.setAdapter(charAdapter);
+    }
+
     /**
      * Load Episode data on the RecyclerView
      * @param response
@@ -378,12 +417,22 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         recyclerView.setAdapter(epAdapter);
     }
 
+    private void putEpisodeData(List<RickMortyEpisode> episodes) {
+        epAdapter = new EpisodeAdapter(episodes, this);
+        recyclerView.setAdapter(epAdapter);
+    }
+
     /**
      * Load Location data on the RecyclerView
      * @param response
      */
     private void putLocationData(ApiResponseLocation response) {
         locAdapter = new LocationAdapter(response, this);
+        recyclerView.setAdapter(locAdapter);
+    }
+
+    private void putLocationData(List<RickMortyLocation> locations) {
+        locAdapter = new LocationAdapter(locations, this);
         recyclerView.setAdapter(locAdapter);
     }
 
@@ -407,6 +456,8 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     //endregion
 
     //region Navigation
+
+    private NavigationBarView navBar;
 
     private void initNav(){
         navBar = findViewById(R.id.navBar);

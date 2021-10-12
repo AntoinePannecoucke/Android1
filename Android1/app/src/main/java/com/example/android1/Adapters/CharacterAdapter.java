@@ -41,10 +41,18 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         this.parent = parent;
     }
 
+    public CharacterAdapter(MainActivity parent, List<RickMortyCharacter> characters, EndScrollListener listener ){
+        this.context = parent;
+        this.dataList = characters;
+        this.scrollEndListener = listener;
+        this.parent = parent;
+    }
+
     @Override
     public void clear() {
         dataList.clear();
     }
+
 
     //region ViewHolder Class
     class CharacterViewHolder extends RecyclerView.ViewHolder {
@@ -138,7 +146,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
     }
 
     /**
-     * Add all the results of a ApiResponse
+     * Add all ApiResponse's results
      * @param response
      */
     @Override
@@ -149,5 +157,10 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
             this.notifyDataSetChanged();
         }
 
+    }
+
+    public void addAll(List<RickMortyCharacter> characters) {
+        dataList.addAll(characters);
+        this.notifyDataSetChanged();
     }
 }

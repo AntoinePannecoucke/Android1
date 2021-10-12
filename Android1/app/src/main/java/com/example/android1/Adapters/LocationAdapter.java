@@ -36,9 +36,20 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         this.parent = parent;
     }
 
+    public LocationAdapter(List<RickMortyLocation> locations, MainActivity parent) {
+        this.dataList = locations;
+        this.scrollEndListener = parent;
+        this.parent = parent;
+    }
+
     @Override
     public void clear() {
         dataList.clear();
+    }
+
+    public void addAll(List<RickMortyLocation> locations) {
+        dataList.addAll(locations);
+        this.notifyDataSetChanged();
     }
 
     //region ViewHolder Class
