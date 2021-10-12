@@ -2,6 +2,7 @@ package com.example.android1.Model.Database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.example.android1.Model.Characters.RickMortyCharacter;
@@ -15,10 +16,10 @@ public interface RickMortyDao {
 
     //region Characters
 
-    @Query("SELECT * FROM rickmortycharacter")
+    @Query("SELECT * FROM rickmortycharacter ")
     List<RickMortyCharacter> getCharacters();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addAllCharacters(List<RickMortyCharacter> characters);
 
     //endregion
@@ -28,7 +29,7 @@ public interface RickMortyDao {
     @Query("SELECT * FROM rickmortyepisode")
     List<RickMortyEpisode> getEpisodes();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addAllEpisodes(List<RickMortyEpisode> episodes);
 
     //endregion
@@ -38,7 +39,7 @@ public interface RickMortyDao {
     @Query("SELECT * FROM rickmortylocation")
     List<RickMortyLocation> getLocations();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addAllLocations(List<RickMortyLocation> locations);
 
     //endregion

@@ -1,13 +1,5 @@
 package com.example.android1;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,12 +10,26 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+
 import com.example.android1.Adapters.CharacterAdapter;
 import com.example.android1.Adapters.EpisodeAdapter;
 import com.example.android1.Adapters.LocationAdapter;
 import com.example.android1.Interface.CustomAdapter;
 import com.example.android1.Interface.EndScrollListener;
 import com.example.android1.Model.ApiResponse;
+import com.example.android1.Model.AsyncTasks.AddCharactersTask;
+import com.example.android1.Model.AsyncTasks.AddEpisodesTask;
+import com.example.android1.Model.AsyncTasks.AddLocationsTask;
+import com.example.android1.Model.AsyncTasks.DatabaseCallback;
+import com.example.android1.Model.AsyncTasks.GetCharactersTask;
+import com.example.android1.Model.AsyncTasks.GetEpisodesTask;
+import com.example.android1.Model.AsyncTasks.GetLocationsTask;
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Characters.RickMortyCharacter;
 import com.example.android1.Model.Database.AppDatabase;
@@ -42,7 +48,6 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -215,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
         /*Create handle for the RetrofitInstance interface*/
         current_page = 1;
         endPage = false;
+        callback = new DatabaseCallback(this);
+
         getCharacterAt(current_page);
 
     }
@@ -253,6 +260,8 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
     private int current_page;
     private boolean endPage;
 
+    private DatabaseCallback callback;
+
     private void initRecyclerView(){
         recyclerView = findViewById(R.id.customRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
@@ -271,7 +280,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseCharacters> call, Response<ApiResponseCharacters> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
-                rickMortyDao.addAllCharacters(response.body().getResults());
+
+                AddCharactersTask task = new AddCharactersTask();
+                task.execute(callback, response.body(), rickMortyDao);
+
                 if (current_page == 1){
                     putCharacterData(response.body());
                 }
@@ -295,12 +307,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseCharacters> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
-                if (current_page == 1){
-                    putCharacterData(rickMortyDao.getCharacters());
-                }
-                else {
-                    charAdapter.addAll(rickMortyDao.getCharacters());
-                }
+
+                GetCharactersTask task = new GetCharactersTask();
+                task.execute(callback, rickMortyDao);
+
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -315,7 +325,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseEpisode> call, Response<ApiResponseEpisode> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
-                rickMortyDao.addAllEpisodes(response.body().getResults());
+
+                AddEpisodesTask task = new AddEpisodesTask();
+                task.execute(callback, response.body(), rickMortyDao);
+
                 if (current_page == 1){
                     putEpisodeData(response.body());
                 }
@@ -340,12 +353,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseEpisode> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
-                if (current_page == 1){
-                    putEpisodeData(rickMortyDao.getEpisodes());
-                }
-                else {
-                    epAdapter.addAll(rickMortyDao.getEpisodes());
-                }
+
+                GetEpisodesTask task = new GetEpisodesTask();
+                task.execute(callback, rickMortyDao);
+
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -359,7 +370,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onResponse(Call<ApiResponseLocation> call, Response<ApiResponseLocation> response) {
                 progressDialog.dismiss();
                 reloadPreferences(response.body());
-                rickMortyDao.addAllLocations(response.body().getResults());
+
+                AddLocationsTask task = new AddLocationsTask();
+                task.execute(callback, response.body(), rickMortyDao);
+
                 if (current_page == 1){
                     putLocationData(response.body());
                 }
@@ -383,12 +397,10 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             public void onFailure(Call<ApiResponseLocation> call, Throwable t) {
                 Log.e("ApiRequest", t.getMessage());
                 progressDialog.dismiss();
-                if (current_page == 1){
-                    putLocationData(rickMortyDao.getLocations());
-                }
-                else {
-                    locAdapter.addAll(rickMortyDao.getLocations());
-                }
+
+                GetLocationsTask task = new GetLocationsTask();
+                task.execute(callback, rickMortyDao);
+
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -505,6 +517,49 @@ public class MainActivity extends AppCompatActivity implements EndScrollListener
             epAdapter.clear();
         if (locAdapter != null)
             locAdapter.clear();
+    }
+
+
+    public void onResponse(List<?> data) {
+        //Is Character
+        if (data.get(0) instanceof RickMortyCharacter){
+            List<RickMortyCharacter> tmp = new ArrayList<>();
+            for (Object d : data){
+                tmp.add((RickMortyCharacter) d);
+            }
+            if (current_page== 1){
+                putCharacterData(tmp);
+            }
+            else {
+                charAdapter.addAll(tmp);
+            }
+        }
+        //Is Episode
+        else if (data.get(0) instanceof RickMortyEpisode){
+            List<RickMortyEpisode> tmp = new ArrayList<>();
+            for (Object d : data){
+                tmp.add((RickMortyEpisode) d);
+            }
+            if (current_page== 1){
+                putEpisodeData(tmp);
+            }
+            else {
+                epAdapter.addAll(tmp);
+            }
+        }
+        //Is Location
+        else if (data.get(0) instanceof RickMortyLocation){
+            List<RickMortyLocation> tmp = new ArrayList<>();
+            for (Object d : data){
+                tmp.add((RickMortyLocation) d);
+            }
+            if (current_page== 1){
+                putLocationData(tmp);
+            }
+            else {
+                locAdapter.addAll(tmp);
+            }
+        }
     }
 
     //endregion
