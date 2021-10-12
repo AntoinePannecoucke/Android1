@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android1.Interface.CustomAdapter;
 import com.example.android1.Interface.EndScrollListener;
+import com.example.android1.MainActivity;
 import com.example.android1.Model.ApiResponse;
 import com.example.android1.Model.Characters.ApiResponseCharacters;
 import com.example.android1.Model.Characters.RickMortyCharacter;
@@ -25,17 +26,19 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
     private List<RickMortyCharacter> dataList;
     private Context context;
     private EndScrollListener scrollEndListener;
+    private MainActivity parent;
 
     /**
      * Constructor
-     * @param context
+     * @param parent
      * @param response
      * @param listener
      */
-    public CharacterAdapter(Context context, ApiResponseCharacters response, EndScrollListener listener){
-        this.context = context;
+    public CharacterAdapter(MainActivity parent, ApiResponseCharacters response, EndScrollListener listener ){
+        this.context = parent;
         this.dataList = response.getResults();
         this.scrollEndListener = listener;
+        this.parent = parent;
     }
 
     @Override
@@ -49,6 +52,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         public final View mView;
 
         ImageView characterImage;
+        ImageView favoriteIcon;
         TextView characterName;
         TextView characterStatusOrigin;
         TextView characterType;
@@ -63,6 +67,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
             super(itemView);
             mView = itemView;
 
+            favoriteIcon = mView.findViewById(R.id.character_favorite_icon);
             characterImage = mView.findViewById(R.id.character_image);
             characterName = mView.findViewById(R.id.character_name);
             characterStatusOrigin = mView.findViewById(R.id.character_status_origin);
@@ -94,6 +99,12 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
     @Override
     public void onBindViewHolder(CharacterViewHolder holder, int position) {
         RickMortyCharacter item = (RickMortyCharacter) dataList.get(position);
+        if (item.isFavorite()){
+            holder.favoriteIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.favoriteIcon.setVisibility(View.INVISIBLE);
+        }
         holder.characterName.setText(item.getName());
         holder.characterGender.setText(item.getGender());
         holder.characterStatusOrigin.setText(item.getStatus() + " - " + item.getOrigin().getName());
@@ -105,6 +116,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
                 .placeholder((R.drawable.ic_launcher_background))
                 .error(R.drawable.ic_launcher_background)
                 .into(holder.characterImage);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                parent.addPreferences(item);
+            }
+        });
 
         if (position == dataList.size() - 1){
             scrollEndListener.onScrollEnd(this);
@@ -128,6 +146,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         if (response instanceof ApiResponseCharacters){
             ApiResponseCharacters tmp = (ApiResponseCharacters) response;
             dataList.addAll(tmp.getResults());
+            this.notifyDataSetChanged();
         }
 
     }

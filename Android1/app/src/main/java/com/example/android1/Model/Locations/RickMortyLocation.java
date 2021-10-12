@@ -1,10 +1,12 @@
 package com.example.android1.Model.Locations;
 
 import java.util.List;
+
+import com.example.android1.Model.RickMortyData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RickMortyLocation {
+public class RickMortyLocation extends RickMortyData {
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -83,5 +85,9 @@ public class RickMortyLocation {
         this.created = created;
     }
 
+
+    public String getKey() {
+        return this.getClass().getSimpleName() + " " + name;
+    }
 }
 

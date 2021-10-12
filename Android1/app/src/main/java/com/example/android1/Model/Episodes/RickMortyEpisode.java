@@ -2,10 +2,11 @@ package com.example.android1.Model.Episodes;
 
 import java.util.List;
 
+import com.example.android1.Model.RickMortyData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RickMortyEpisode {
+public class RickMortyEpisode extends RickMortyData {
 
     //region Gson Data
     @SerializedName("id")
@@ -88,6 +89,12 @@ public class RickMortyEpisode {
     public void setCreated(String created) {
         this.created = created;
     }
+
+    public String getKey() {
+        return this.getClass().getSimpleName() + " " + name;
+    }
+
+
     //endregion
 
 }

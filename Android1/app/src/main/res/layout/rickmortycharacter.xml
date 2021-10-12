@@ -28,7 +28,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="243dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
@@ -71,6 +71,12 @@
                     android:text="TextView"
                     app:layout_constraintEnd_toStartOf="@+id/character_image" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/character_favorite_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:drawable/btn_star_big_on" />
 
         </LinearLayout>
 
