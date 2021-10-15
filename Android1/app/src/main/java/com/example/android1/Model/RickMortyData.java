@@ -1,6 +1,7 @@
 package com.example.android1.Model;
 
 public abstract class RickMortyData {
+
     protected boolean isFavorite;
 
     public RickMortyData() {

@@ -37,9 +37,20 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         this.parent = parent;
     }
 
+    public EpisodeAdapter(List<RickMortyEpisode> episodes, MainActivity parent) {
+        this.dataList = episodes;
+        this.scrollEndListener = parent;
+        this.parent = parent;
+    }
+
     @Override
     public void clear() {
         dataList.clear();
+    }
+
+    public void addAll(List<RickMortyEpisode> episodes) {
+        dataList.addAll(episodes);
+        this.notifyDataSetChanged();
     }
 
     //region ViewHolder Class
