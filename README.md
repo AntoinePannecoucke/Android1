@@ -6,3 +6,5 @@
 * Pagination
 * Gestion des favoris avec les SharedPreferences
 * Mode Offline avec Room
+
+# Apk non signé disponible dans l'onglet "Releases"
